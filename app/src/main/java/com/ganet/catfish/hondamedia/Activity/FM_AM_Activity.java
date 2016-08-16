@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,8 +16,12 @@ import android.widget.Toast;
 import com.ganet.catfish.hondamedia.R;
 
 public class FM_AM_Activity extends AppCompatActivity {
-
+    static final String TAG = "GaNetService";
     public static final String RADIOINFO = "com.ganet.catfish.ganet_service.radio";
+
+    int fm1IDs[] = { R.id.fm1_1, R.id.fm1_2, R.id.fm1_3, R.id.fm1_4, R.id.fm1_5, R.id.fm1_6 };
+    int fm2IDs[] = { R.id.fm2_1, R.id.fm2_2, R.id.fm2_3, R.id.fm2_4, R.id.fm2_5, R.id.fm2_6 };
+    int amIDs[] = { R.id.am1, R.id.am2, R.id.am3, R.id.am4, R.id.am5, R.id.am6 };
 
     public enum eRadioType {
         eFM1,
@@ -37,6 +43,17 @@ public class FM_AM_Activity extends AppCompatActivity {
         String frequency;
         int soredId;
         int quality;
+
+        String getStrType (eRadioType currentType) {
+            if( currentType == eRadioType.eFM1 )
+                return "FM1";
+            if( currentType == eRadioType.eFM2 )
+                return "FM2";
+            if( currentType == eRadioType.eAM )
+                return "AM";
+
+            return "";
+        }
 
         eRadioCommand valueOf(int val) {
             switch (val){
@@ -68,7 +85,7 @@ public class FM_AM_Activity extends AppCompatActivity {
     BroadcastReceiver br;
     RADIOData rData;
     boolean play = true;
-    TextView tvFrq;
+    TextView tvFrq, tvRType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +93,7 @@ public class FM_AM_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_fm__am);
         longClick();
         tvFrq = (TextView) findViewById(R.id.tvFrq);
+        tvRType = (TextView) findViewById(R.id.tvRType);
 
         rData = new RADIOData();
 
@@ -92,7 +110,8 @@ public class FM_AM_Activity extends AppCompatActivity {
                         rData.frequency = intent.getStringExtra("radioFr");
                         rData.quality = intent.getIntExtra("radioQuality", 0 );
                         rData.soredId = intent.getIntExtra("radioStoreId", 0 );
-                        updateRadioInfoUi(rData);
+                        final RADIOData sendData = rData;
+                        updateRadioInfoUi(sendData);
                         break;
                 }
             }
@@ -100,12 +119,26 @@ public class FM_AM_Activity extends AppCompatActivity {
         registerReceiver(br, filter);
     }
 
-    /**
-     *
-     * @param rData
-     */
-    private void updateRadioInfoUi(RADIOData rData) {
-        tvFrq.setText(rData.frequency);
+
+    private void updateRadioInfoUi(RADIOData sendData) {
+        tvFrq.setText(sendData.frequency);
+        tvRType.setText(sendData.getStrType(sendData.currentType));
+        if( eRadioCommand.ePlay == rData.activeCommand ){
+            ((ImageView) findViewById(R.id.play_pause)).setImageResource(R.drawable.pause);
+        } else {
+            ((ImageView) findViewById(R.id.play_pause)).setImageResource(R.drawable.play);
+        }
+
+        if( sendData.soredId > 0 && sendData.soredId <= 6 ){
+            int idFMAM = 0;
+            if( eRadioType.eFM1 == sendData.currentType ) idFMAM = fm1IDs[sendData.soredId - 1];
+            else if( eRadioType.eFM2 == sendData.currentType ) idFMAM = fm2IDs[sendData.soredId - 1];
+            else if( eRadioType.eAM == sendData.currentType ) idFMAM = amIDs[sendData.soredId - 1];
+
+            ((TextView)findViewById(idFMAM)).setText(sendData.frequency);
+        } else {
+            Log.w( TAG, "Not in the store = " + sendData.soredId );
+        }
     }
 
     void longClick() {

@@ -450,30 +450,44 @@
             android:layout_gravity="left|bottom"
             android:layout_margin="30dp" />
 
-        <TextView
-            android:id="@+id/tvFrq"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_weight="5"
-            android:gravity="center_vertical"
-            android:textColor="#000"
-            android:textSize="105dp"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"
-            android:textStyle="bold" />
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvFrq"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="5"
+                android:gravity="center_vertical"
+                android:textColor="#000"
+                android:textSize="105dp"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/tvRType"
+                android:layout_gravity="bottom|right"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/back"
             android:layout_width="40dp"
             android:layout_height="60dp"
-            android:layout_gravity="top|left|center_vertical"
             android:clickable="true"
             android:onClick="onClick"
             android:src="@drawable/back"
             android:layout_margin="8dp"
-            android:layout_marginBottom="0dp"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.2" />
 
     </LinearLayout>
 
