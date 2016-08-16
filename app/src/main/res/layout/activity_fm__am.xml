@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f0f0f0"
+    android:orientation="vertical"
+    tools:context=".Activity.FM_AM_Activity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:background="#007cc2">
+
+                    <TextView
+                        android:id="@+id/fm1_1"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="101.5"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm1_2"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="fm1"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm1_3"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="fm1"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm1_4"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="fm1"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm1_5"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="fm1"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm1_6"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm1"
+                        android:text="fm1"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_1"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_2"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_3"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_4"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_5"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/fm2_6"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="fm2"
+                        android:text="fm2"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am1"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am2"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am3"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am4"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am5"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/black" />
+
+                    <TextView
+                        android:id="@+id/am6"
+                        android:layout_width="80dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="4dp"
+                        android:clickable="true"
+                        android:gravity="center"
+                        android:onClick="onClickRadio"
+                        android:tag="am"
+                        android:text="am"
+                        android:textColor="@color/primary_text_default_material_dark"
+                        android:textSize="24dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="centerInside"
+            android:src="@drawable/radio"
+            android:layout_gravity="left|bottom"
+            android:layout_margin="30dp" />
+
+        <TextView
+            android:id="@+id/tvFrq"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="5"
+            android:gravity="center_vertical"
+            android:textColor="#000"
+            android:textSize="105dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:layout_gravity="top|left|center_vertical"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/back"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="0dp"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/prev"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/prev"
+            android:layout_gravity="left"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/play_pause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/play"
+            android:layout_gravity="center"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/next"
+            android:layout_gravity="right"
+            android:layout_weight="1" />
+    </LinearLayout>
+</LinearLayout>
