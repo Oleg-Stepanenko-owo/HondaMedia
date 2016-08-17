@@ -44,7 +44,9 @@
                         android:text="101.5"
                         android:textColor="@color/primary_text_default_material_dark"
                         android:textSize="24dp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:autoText="false"
+                        android:textIsSelectable="false" />
 
                     <View
                         android:layout_width="1dp"

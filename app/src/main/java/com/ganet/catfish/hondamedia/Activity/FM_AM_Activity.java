@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,10 +19,14 @@ import com.ganet.catfish.hondamedia.R;
 public class FM_AM_Activity extends AppCompatActivity {
     static final String TAG = "GaNetService";
     public static final String RADIOINFO = "com.ganet.catfish.ganet_service.radio";
+    int idFMAM;
+    SharedPreferences sPref;
 
     int fm1IDs[] = { R.id.fm1_1, R.id.fm1_2, R.id.fm1_3, R.id.fm1_4, R.id.fm1_5, R.id.fm1_6 };
     int fm2IDs[] = { R.id.fm2_1, R.id.fm2_2, R.id.fm2_3, R.id.fm2_4, R.id.fm2_5, R.id.fm2_6 };
     int amIDs[] = { R.id.am1, R.id.am2, R.id.am3, R.id.am4, R.id.am5, R.id.am6 };
+
+    String radioIDs[] = { "FM1_1", "FM1_2", "FM1_3", "FM1_4", "FM1_5", "FM1_6", "FM2_1", "FM2_2", "FM2_3", "FM2_4", "FM2_5", "FM2_6", "AM1", "AM2", "AM3", "AM4", "AM5", "AM6" };
 
     public enum eRadioType {
         eFM1,
@@ -90,6 +95,8 @@ public class FM_AM_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        idFMAM = 0;
+
         setContentView(R.layout.activity_fm__am);
         longClick();
         tvFrq = (TextView) findViewById(R.id.tvFrq);
@@ -121,22 +128,36 @@ public class FM_AM_Activity extends AppCompatActivity {
 
 
     private void updateRadioInfoUi(RADIOData sendData) {
+        int lastId = idFMAM;
         tvFrq.setText(sendData.frequency);
         tvRType.setText(sendData.getStrType(sendData.currentType));
-        if( eRadioCommand.ePlay == rData.activeCommand ){
+        if( eRadioCommand.ePlay == rData.activeCommand ) {
             ((ImageView) findViewById(R.id.play_pause)).setImageResource(R.drawable.pause);
         } else {
             ((ImageView) findViewById(R.id.play_pause)).setImageResource(R.drawable.play);
         }
 
-        if( sendData.soredId > 0 && sendData.soredId <= 6 ){
-            int idFMAM = 0;
+        if( sendData.soredId > 0 && sendData.soredId <= 6 ) {
+            int idStore = -1;
             if( eRadioType.eFM1 == sendData.currentType ) idFMAM = fm1IDs[sendData.soredId - 1];
-            else if( eRadioType.eFM2 == sendData.currentType ) idFMAM = fm2IDs[sendData.soredId - 1];
-            else if( eRadioType.eAM == sendData.currentType ) idFMAM = amIDs[sendData.soredId - 1];
+            else if( eRadioType.eFM2 == sendData.currentType ){ idFMAM = fm2IDs[sendData.soredId - 1]; idStore = 5; }
+            else if( eRadioType.eAM == sendData.currentType ){ idFMAM = amIDs[sendData.soredId - 1]; idStore = 11; }
 
             ((TextView)findViewById(idFMAM)).setText(sendData.frequency);
+            ((TextView)findViewById(idFMAM)).setTextColor( getResources().getColor( R.color.activeRadioColor) );
+            if( (lastId != 0 && lastId != idFMAM) )
+                ((TextView)findViewById(lastId)).setTextColor( getResources().getColor( R.color.primary_text_default_material_dark ) );
+
+
+            idStore += sendData.soredId;
+
+            sPref = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor ed = sPref.edit();
+            ed.putString( radioIDs[idStore], sendData.frequency );
+            ed.commit();
+
         } else {
+            ((TextView)findViewById(lastId)).setTextColor( getResources().getColor( R.color.primary_text_default_material_dark ) );
             Log.w( TAG, "Not in the store = " + sendData.soredId );
         }
     }
@@ -162,6 +183,14 @@ public class FM_AM_Activity extends AppCompatActivity {
         findViewById(R.id.am4).setOnLongClickListener(longClick);
         findViewById(R.id.am5).setOnLongClickListener(longClick);
         findViewById(R.id.am6).setOnLongClickListener(longClick);
+
+        sPref = getPreferences(MODE_PRIVATE);
+        for ( int a = 0; a < radioIDs.length; a++ ) {
+            String savedText = sPref.getString( radioIDs[a], radioIDs[a] );
+            if( a < 6 ) ((TextView)findViewById(fm1IDs[a])).setText(savedText);
+            else if( a >= 6 && a < 12 ) ((TextView)findViewById(fm2IDs[a-6])).setText(savedText);
+            else ((TextView)findViewById(amIDs[a-12])).setText(savedText);
+        }
     }
 
     public void onClick(View v) {
