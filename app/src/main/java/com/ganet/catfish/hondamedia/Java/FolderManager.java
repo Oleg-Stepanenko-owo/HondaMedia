@@ -11,15 +11,17 @@ import java.util.ArrayList;
 
 public class FolderManager {
 
+    private int id, parentId;
     String name;
     Object tag;
     ArrayList<FileManager> files;
     ArrayList<FolderManager> folders;
 
-    public FolderManager(String _name) {
+    public FolderManager(int id, String _name) {
         files = new ArrayList<>();
         folders = new ArrayList<>();
         name = _name;
+        this.id = id;
     }
 
     public void setName(String _name) {
@@ -82,4 +84,12 @@ public class FolderManager {
             }
         }
     };
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
 }
