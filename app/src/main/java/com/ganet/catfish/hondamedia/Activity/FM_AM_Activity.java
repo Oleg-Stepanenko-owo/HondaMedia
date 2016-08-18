@@ -126,6 +126,11 @@ public class FM_AM_Activity extends AppCompatActivity {
         registerReceiver(br, filter);
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(br);
+        super.onDestroy();
+    }
 
     private void updateRadioInfoUi(RADIOData sendData) {
         int lastId = idFMAM;

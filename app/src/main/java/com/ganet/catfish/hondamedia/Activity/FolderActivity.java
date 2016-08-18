@@ -56,12 +56,22 @@ public class FolderActivity extends AppCompatActivity {
                                 mFolder = foldersMap.get( new Integer(folderId) );
                             } else {
                                 mFolder = new FolderManager(folderId, name);
+                                foldersMap.put(folderId, mFolder );
                             }
 
                             mFolder.setParentId( parentId );
                             mFolder.setName( name );
-                            updateFolderUi();
 
+                            int subFCount = intent.getIntExtra("SubFCount", 0);
+                            if( subFCount != 0 ) {
+                                for( int a = 0; a < subFCount; a++ ) {
+                                    int sub = intent.getIntExtra("subID" + String.valueOf(a), 0);
+                                    if((sub != 0) && (!mFolder.subFoldersID.contains(sub)) )
+                                        mFolder.subFoldersID.add(sub);
+                                }
+                            }
+                            final Map< Integer, FolderManager > tmpFoldersMap  = foldersMap;
+                            updateFolderUi(tmpFoldersMap);
                         }
 
                         break;
@@ -110,12 +120,35 @@ public class FolderActivity extends AppCompatActivity {
 
     }
 
-    private void updateFolderUi() {
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(br);
+        super.onDestroy();
+    }
+
+    private void updateFolderUi(final Map<Integer, FolderManager> tmpFoldersMap ) {
         runOnUiThread(new Runnable() {
                           @Override
                           public void run() {
-                              FolderManager root = new FolderManager("Root");
-                              folders.addView(root.getView(getLayoutInflater(), 0));
+                              if( tmpFoldersMap.containsKey(new Integer(0)) ) {
+                                  FolderManager root = tmpFoldersMap.get(new Integer(0));
+                                  updateSubFolder( root );
+                                  folders.removeAllViews();
+                                  folders.addView(root.getView(getLayoutInflater(), 0));
+                              }
+                          }
+
+                          private void updateSubFolder(FolderManager folder) {
+                              folder.folders.clear();
+                              folder.files.clear();
+                              for( int a =0; a < folder.subFoldersID.size(); a++ ) {
+                                    Integer id = folder.subFoldersID.get(a);
+                                  if(tmpFoldersMap.containsKey(id)) {
+                                      FolderManager nextFolder = tmpFoldersMap.get(id);
+                                      folder.addFolder(nextFolder);
+                                      updateSubFolder(nextFolder);
+                                  }
+                              }
                           }
                       }
         );

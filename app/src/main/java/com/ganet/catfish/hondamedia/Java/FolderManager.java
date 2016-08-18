@@ -8,20 +8,24 @@ import android.widget.TextView;
 import com.ganet.catfish.hondamedia.R;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Vector;
 
 public class FolderManager {
 
     private int id, parentId;
     String name;
     Object tag;
-    ArrayList<FileManager> files;
-    ArrayList<FolderManager> folders;
+    public Vector< Integer > subFoldersID;
+    public ArrayList<FileManager> files;
+    public ArrayList<FolderManager> folders;
 
     public FolderManager(int id, String _name) {
         files = new ArrayList<>();
         folders = new ArrayList<>();
         name = _name;
         this.id = id;
+        subFoldersID = new Vector<Integer>();
     }
 
     public void setName(String _name) {

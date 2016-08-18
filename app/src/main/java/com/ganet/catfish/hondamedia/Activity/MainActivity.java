@@ -47,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(br, filter);
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(br);
+        super.onDestroy();
+    }
+
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.cd_dvd:{
