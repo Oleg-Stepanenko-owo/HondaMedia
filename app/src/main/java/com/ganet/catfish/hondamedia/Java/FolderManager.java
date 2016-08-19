@@ -14,30 +14,38 @@ import java.util.Vector;
 public class FolderManager {
 
     private int id, parentId;
+    public int calcFrom, filesCount;
     String name;
     Object tag;
     public Vector< Integer > subFoldersID;
+    public Vector< Integer > filesID;
+
     public ArrayList<FileManager> files;
     public ArrayList<FolderManager> folders;
 
-    public FolderManager(int id, String _name) {
+    public FolderManager(int id, String name) {
         files = new ArrayList<>();
         folders = new ArrayList<>();
-        name = _name;
-        this.id = id;
+
         subFoldersID = new Vector<Integer>();
+        filesID = new Vector<Integer>();
+
+        this.name = name;
+        this.id = id;
+        calcFrom = 0;
+        filesCount = 0;
     }
 
-    public void setName(String _name) {
-        name = _name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setTag(String _tag) {
-        tag = _tag;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public Object getTag() {

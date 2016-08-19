@@ -25,6 +25,8 @@ public class FolderActivity extends AppCompatActivity {
 
     public static final String FOLDERINFO = "com.ganet.catfish.ganet_service.folderinfo";
     public static final String FOLDERINFO_REQ = "com.ganet.catfish.ganet_service.folderinforeq";
+    public static final String FOLDERBYREQ = "com.ganet.catfish.ganet_service.folderbyreq";
+    public static final String FILESBYREQ = "com.ganet.catfish.ganet_service.filesbyreq";
 
     LinearLayout folders;
     TextView folder_name;
@@ -32,6 +34,7 @@ public class FolderActivity extends AppCompatActivity {
     BroadcastReceiver br;
 
     Map< Integer, FolderManager > foldersMap;
+    Map< Integer, FileManager > fileMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +42,13 @@ public class FolderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_folder);
 
         foldersMap = new TreeMap<Integer, FolderManager>();
+        fileMap =  new TreeMap<Integer, FileManager>();
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(FOLDERINFO);
+        filter.addAction(FOLDERBYREQ);
+        filter.addAction(FILESBYREQ);
+
         br = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -75,6 +83,89 @@ public class FolderActivity extends AppCompatActivity {
                         }
 
                         break;
+                    case FOLDERBYREQ:
+                    {
+                        /*
+                        in.putExtra( "diskID", mGANET.mActiveTrack.diskID );
+                        int folderCount = mGANET.mFolder.mFoldersData.size();
+                        in.putExtra( "folderCount", folderCount );
+                        int a = 0;
+                        for( Map.Entry<Integer, FolderData> el : mGANET.mFolder.mFoldersData.entrySet() ) {
+                            final FolderData fData = el.getValue();
+                            in.putExtra( "keyFolder_" + String.valueOf(a), el.getKey() );
+                            in.putExtra( "parentIDFolder_" + String.valueOf(a), fData.parentID );
+                            in.putExtra( "nameFolder_" + String.valueOf(a), fData.getName() );
+                            in.putExtra( "calcFromFolder_" + String.valueOf(a), fData.trackCalcFrom );
+                            in.putExtra( "trackCountFolder_" + String.valueOf(a), fData.trackCount );
+                            int subFolders = fData.subFoldersId.size();
+                            in.putExtra( "subFolderCountFolder_" + String.valueOf(a), subFolders );
+                            for( int subFoldersId = 0; subFoldersId < fData.subFoldersId.size(); subFoldersId++ ) {
+                                in.putExtra( "subFolderID" + subFoldersId + "CountFolder_" + String.valueOf(a), fData.subFoldersId.get(subFoldersId) );
+                            }
+                         */
+                        if( intent.hasExtra("diskID") && intent.hasExtra("folderCount") ) {
+                            for( int fCount = 0; fCount < intent.getIntExtra("folderCount", 0); fCount++ ) {
+                                int folderID = intent.getIntExtra("keyFolder_" + fCount, 0);
+                                String folderName = intent.getStringExtra("nameFolder_" + fCount );
+                                FolderManager mFolder;
+                                if( foldersMap.containsKey( new Integer(folderID) ) ){
+                                    mFolder = foldersMap.get( new Integer(folderID) );
+                                } else {
+                                    mFolder = new FolderManager(folderID, folderName);
+                                    foldersMap.put(folderID, mFolder );
+                                }
+
+                                mFolder.setParentId( intent.getIntExtra("parentIDFolder_" + fCount, 0) );
+                                mFolder.calcFrom = intent.getIntExtra("calcFromFolder_" + fCount, 0);
+                                mFolder.filesCount = intent.getIntExtra("trackCountFolder_" + fCount, 0);
+                                for( int subF = 0; subF < intent.getIntExtra("subFolderCountFolder_" + fCount, 0); subF++ ) {
+                                    int subFolderID = intent.getIntExtra( "subFolderID" + subF + "CountFolder_" + fCount, 0);
+                                    if( !mFolder.subFoldersID.contains( subFolderID ) )
+                                    mFolder.subFoldersID.add( subFolderID );
+                                }
+                            }
+                        }
+                        final Map< Integer, FolderManager > tmpFoldersMap  = foldersMap;
+                        updateFolderUi(tmpFoldersMap);
+                    }
+                    break;
+                    case FILESBYREQ:
+                    {
+                        /*
+                        in.putExtra( "fileCount", fileCount );
+                        a = 0;
+                        for( Map.Entry<Integer, Track> trEl : trackMap.entrySet() ) {
+                            Track currTr = trEl.getValue();
+                            in.putExtra( "trackId_" + String.valueOf(a), currTr.getTrackId() );
+                            in.putExtra( "trackFId_" + String.valueOf(a), currTr.getFolderId() );
+                            in.putExtra( "trackName_"+ String.valueOf(a), currTr.getName() );
+                            in.putExtra( "trackSelect_"+ String.valueOf(a), currTr.selectedTrack );
+                        }
+
+                        */
+                        if( intent.hasExtra("fileCount") ) {
+                            for( int fCount = 0; fCount < intent.getIntExtra("fileCount", 0); fCount++ ) {
+                                int trID = intent.getIntExtra("trackId_" + fCount, 0);
+                                int trFID = intent.getIntExtra("trackFId_" + fCount, 0);
+                                String trName = intent.getStringExtra("trackName_" + fCount);
+                                boolean rtIsSelect = intent.getBooleanExtra("trackSelect_" + fCount,false);
+
+                                FileManager mFileTr;
+                                if( fileMap.containsKey( new Integer(trID) ) ){
+                                    mFileTr = fileMap.get( new Integer(trID) );
+                                } else {
+                                    mFileTr = new FileManager(trID, trName);
+                                    fileMap.put(trID, mFileTr );
+                                }
+                                mFileTr.folderId = trFID;
+                                mFileTr.isSelect = rtIsSelect;
+                            }
+                        }
+
+                        final Map< Integer, FileManager > tmpFileMap  = fileMap;
+                        updateFileUi(tmpFileMap);
+                    }
+                    break;
                 }
             }
         };
@@ -94,36 +185,22 @@ public class FolderActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        //Пример
-//        FolderManager root = new FolderManager("Root");
-//        FolderManager dir1 = new FolderManager("Dir1");
-//        FileManager file11 = new FileManager("file1");
-//        FileManager file12 = new FileManager("file2");
-//        FolderManager dir2 = new FolderManager("Dir2");
-//        FileManager file21 = new FileManager("file1");
-//        FileManager file22 = new FileManager("file2");
-//        FileManager file1 = new FileManager("file1");
-//        FileManager file2 = new FileManager("file2");
-//
-//        root.addFolder(dir1);
-//        root.addFile(file1);
-//        root.addFile(file2);
-//
-//        dir1.addFolder(dir2);
-//        dir1.addFile(file11);
-//        dir1.addFile(file12);
-//
-//        dir2.addFile(file21);
-//        dir2.addFile(file21);
-
-
     }
 
     @Override
     protected void onDestroy() {
         unregisterReceiver(br);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(foldersMap.size() == 0)
+        {
+            Intent in = new Intent(FOLDERINFO_REQ);
+            sendBroadcast(in);
+        }
     }
 
     private void updateFolderUi(final Map<Integer, FolderManager> tmpFoldersMap ) {
@@ -141,6 +218,8 @@ public class FolderActivity extends AppCompatActivity {
                           private void updateSubFolder(FolderManager folder) {
                               folder.folders.clear();
                               folder.files.clear();
+                              folder.filesID.clear();
+
                               for( int a =0; a < folder.subFoldersID.size(); a++ ) {
                                     Integer id = folder.subFoldersID.get(a);
                                   if(tmpFoldersMap.containsKey(id)) {
@@ -152,6 +231,28 @@ public class FolderActivity extends AppCompatActivity {
                           }
                       }
         );
+    }
+
+    private void updateFileUi( final Map<Integer, FileManager> tmpFileMap ) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for( Map.Entry<Integer, FileManager> trEl : tmpFileMap.entrySet() ) {
+                    FileManager tmpFile = trEl.getValue();
+                    int folderID = tmpFile.folderId;
+                    if( foldersMap.containsKey( folderID )
+                            && !foldersMap.get(folderID).filesID.contains( tmpFile.id ) ) {
+                        foldersMap.get(folderID).addFile( tmpFile );
+                        foldersMap.get(folderID).filesID.add( tmpFile.id );
+                    }
+                }
+                if( foldersMap.containsKey(new Integer(0)) )
+                {
+                    folders.removeAllViews();
+                    folders.addView( (foldersMap.get(new Integer(0))).getView(getLayoutInflater(), 0));
+                }
+            }
+        });
     }
 
     void File() {

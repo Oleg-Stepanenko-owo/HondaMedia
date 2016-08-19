@@ -9,23 +9,28 @@ import com.ganet.catfish.hondamedia.R;
 
 public class FileManager {
 
+    public int id;
+    public int folderId;
+    public boolean isSelect;
     String name;
+
     Object tag;
 
-    public FileManager(String _name) {
-        name = _name;
+    public FileManager(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public void setName(String _name) {
-        name = _name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setTag(String _tag) {
-        tag = _tag;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public Object getTag() {
