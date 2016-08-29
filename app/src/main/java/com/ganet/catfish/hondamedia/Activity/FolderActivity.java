@@ -27,11 +27,13 @@ public class FolderActivity extends AppCompatActivity {
     public static final String FOLDERINFO_REQ = "com.ganet.catfish.ganet_service.folderinforeq";
     public static final String FOLDERBYREQ = "com.ganet.catfish.ganet_service.folderbyreq";
     public static final String FILESBYREQ = "com.ganet.catfish.ganet_service.filesbyreq";
+    public static final String TRACKINFO = "com.ganet.catfish.ganet_service.track";
 
     LinearLayout folders;
     TextView folder_name;
     Switch switchCompat;
     BroadcastReceiver br;
+    boolean addedRoot;
 
     Map< Integer, FolderManager > foldersMap;
     Map< Integer, FileManager > fileMap;
@@ -40,6 +42,7 @@ public class FolderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
+        addedRoot = false;
 
         foldersMap = new TreeMap<Integer, FolderManager>();
         fileMap =  new TreeMap<Integer, FileManager>();
@@ -48,6 +51,7 @@ public class FolderActivity extends AppCompatActivity {
         filter.addAction(FOLDERINFO);
         filter.addAction(FOLDERBYREQ);
         filter.addAction(FILESBYREQ);
+        filter.addAction(TRACKINFO);
 
         br = new BroadcastReceiver() {
             @Override
@@ -78,8 +82,12 @@ public class FolderActivity extends AppCompatActivity {
                                         mFolder.subFoldersID.add(sub);
                                 }
                             }
-                            final Map< Integer, FolderManager > tmpFoldersMap  = foldersMap;
-                            updateFolderUi(tmpFoldersMap);
+                            {
+                                final Map< Integer, FolderManager > tmpFoldersMap = foldersMap;
+                                updateFolderUi(tmpFoldersMap);
+                                final Map< Integer, FileManager > tmpFileMap = fileMap;
+                                updateFileUi(tmpFileMap);
+                            }
                         }
 
                         break;
@@ -162,9 +170,34 @@ public class FolderActivity extends AppCompatActivity {
                             }
                         }
 
-                        final Map< Integer, FileManager > tmpFileMap  = fileMap;
+                        final Map< Integer, FileManager > tmpFileMap = fileMap;
                         updateFileUi(tmpFileMap);
+                        break;
                     }
+                    case TRACKINFO:
+                        if( intent.hasExtra("TrackId") ) {
+                            int trackId = intent.getIntExtra("TrackId", 0);
+                            int folderId = intent.getIntExtra("FolderId", 0);
+                            boolean isSelect = intent.getBooleanExtra("selected", false);
+                            String name = intent.getStringExtra("TrackName");
+
+                            if( fileMap.containsKey(trackId) ) {
+                                final FileManager fm = fileMap.get(trackId);
+                                fileMap.remove(trackId);
+                                fm.isSelect = isSelect;
+                                fm.folderId = folderId;
+                                if( !fm.getName().isEmpty())
+                                    fm.setName(name);
+                                fileMap.put(trackId, fm);
+                            } else {
+                                FileManager fm = new FileManager(trackId, name);
+                                fm.isSelect = isSelect;
+                                fm.folderId = folderId;
+                                fileMap.put(trackId, fm);
+                            }
+                        }
+                        final Map< Integer, FileManager > tmpFileMap = fileMap;
+                        updateFileUi(tmpFileMap);
                     break;
                 }
             }
@@ -203,6 +236,9 @@ public class FolderActivity extends AppCompatActivity {
         }
     }
 
+    //TODO: if is files, after updating also add its.
+    //TODO: Main folder without name.
+    //TODO: Activity head not actual.
     private void updateFolderUi(final Map<Integer, FolderManager> tmpFoldersMap ) {
         runOnUiThread(new Runnable() {
                           @Override
@@ -210,21 +246,29 @@ public class FolderActivity extends AppCompatActivity {
                               if( tmpFoldersMap.containsKey(new Integer(0)) ) {
                                   FolderManager root = tmpFoldersMap.get(new Integer(0));
                                   updateSubFolder( root );
-                                  folders.removeAllViews();
+                                  folders.removeView(root.getView(getLayoutInflater(), 0));
                                   folders.addView(root.getView(getLayoutInflater(), 0));
                               }
                           }
 
                           private void updateSubFolder(FolderManager folder) {
-                              folder.folders.clear();
-                              folder.files.clear();
-                              folder.filesID.clear();
+//                              folder.folders.clear();
+//                              folder.files.clear();
+//                              folder.filesID.clear();
 
-                              for( int a =0; a < folder.subFoldersID.size(); a++ ) {
+                              for( int a = 0; a < folder.subFoldersID.size(); a++ ) {
                                     Integer id = folder.subFoldersID.get(a);
-                                  if(tmpFoldersMap.containsKey(id)) {
+                                  if(tmpFoldersMap.containsKey(id) ) {
+                                      boolean isExistFolder = false;
+                                      for( int b = 0; b < folder.folders.size(); b++ )
+                                      {
+                                          if( ((FolderManager)folder.folders.get(b)).getId() == id ){
+                                              isExistFolder = true;
+                                              break;
+                                          }
+                                      }
                                       FolderManager nextFolder = tmpFoldersMap.get(id);
-                                      folder.addFolder(nextFolder);
+                                      if( !isExistFolder ) folder.addFolder(nextFolder);
                                       updateSubFolder(nextFolder);
                                   }
                               }
@@ -233,6 +277,8 @@ public class FolderActivity extends AppCompatActivity {
         );
     }
 
+    //TODO: added request for automaticly updating new files in list
+    //TODO: select currently active(play selected) track
     private void updateFileUi( final Map<Integer, FileManager> tmpFileMap ) {
         runOnUiThread(new Runnable() {
             @Override
@@ -240,12 +286,16 @@ public class FolderActivity extends AppCompatActivity {
                 for( Map.Entry<Integer, FileManager> trEl : tmpFileMap.entrySet() ) {
                     FileManager tmpFile = trEl.getValue();
                     int folderID = tmpFile.folderId;
-                    if( foldersMap.containsKey( folderID )
-                            && !foldersMap.get(folderID).filesID.contains( tmpFile.id ) ) {
-                        foldersMap.get(folderID).addFile( tmpFile );
-                        foldersMap.get(folderID).filesID.add( tmpFile.id );
+                    if( foldersMap.containsKey( folderID ) ){
+                        if( !foldersMap.get(folderID).filesID.contains( tmpFile.id ) ) {
+                            foldersMap.get(folderID).addFile( tmpFile );
+                            foldersMap.get(folderID).filesID.add( tmpFile.id );
+                        } else {
+                            foldersMap.get(folderID).addFile( tmpFile );
+                        }
                     }
                 }
+
                 if( foldersMap.containsKey(new Integer(0)) )
                 {
                     folders.removeAllViews();

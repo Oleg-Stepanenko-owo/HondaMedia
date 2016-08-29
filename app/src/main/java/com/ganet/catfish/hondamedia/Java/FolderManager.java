@@ -53,6 +53,7 @@ public class FolderManager {
     }
 
     public void addFile(FileManager file) {
+        files.remove(file);
         files.add(file);
     }
 
@@ -103,5 +104,9 @@ public class FolderManager {
 
     public int getParentId() {
         return parentId;
+    }
+
+    public int getId() {
+        return id;
     }
 }
