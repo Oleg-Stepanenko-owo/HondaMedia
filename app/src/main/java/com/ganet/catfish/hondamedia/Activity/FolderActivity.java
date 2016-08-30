@@ -28,12 +28,15 @@ public class FolderActivity extends AppCompatActivity {
     public static final String FOLDERBYREQ = "com.ganet.catfish.ganet_service.folderbyreq";
     public static final String FILESBYREQ = "com.ganet.catfish.ganet_service.filesbyreq";
     public static final String TRACKINFO = "com.ganet.catfish.ganet_service.track";
+    public static final String DISKID = "com.ganet.catfish.ganet_service.diskid";
+    public static final String ACTIVETR = "com.ganet.catfish.ganet_service.activetr";
 
     LinearLayout folders;
     TextView folder_name;
     Switch switchCompat;
     BroadcastReceiver br;
     boolean addedRoot;
+    int currentDisk;
 
     Map< Integer, FolderManager > foldersMap;
     Map< Integer, FileManager > fileMap;
@@ -43,6 +46,7 @@ public class FolderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
         addedRoot = false;
+        currentDisk = 0;
 
         foldersMap = new TreeMap<Integer, FolderManager>();
         fileMap =  new TreeMap<Integer, FileManager>();
@@ -52,6 +56,8 @@ public class FolderActivity extends AppCompatActivity {
         filter.addAction(FOLDERBYREQ);
         filter.addAction(FILESBYREQ);
         filter.addAction(TRACKINFO);
+        filter.addAction(DISKID);
+        filter.addAction(ACTIVETR);
 
         br = new BroadcastReceiver() {
             @Override
@@ -198,7 +204,24 @@ public class FolderActivity extends AppCompatActivity {
                         }
                         final Map< Integer, FileManager > tmpFileMap = fileMap;
                         updateFileUi(tmpFileMap);
-                    break;
+                        break;
+                    case DISKID:
+                        foldersMap.clear();
+                        fileMap.clear();
+                        if( intent.hasExtra("diskID") ) {
+                            currentDisk = intent.getIntExtra("diskID", 0);
+                        }
+                        ((TextView) findViewById(R.id.folder_name)).setText( "DISK#" + currentDisk );
+                        cleanFolderUi();
+                        break;
+                    case ACTIVETR:
+                        if( currentDisk == 0 ) {
+                            if( intent.hasExtra("diskID") ) {
+                                currentDisk = intent.getIntExtra("diskID", 0);
+                                ((TextView) findViewById(R.id.folder_name)).setText( "DISK#" + currentDisk );
+                            }
+                        }
+                        break;
                 }
             }
         };
@@ -236,7 +259,16 @@ public class FolderActivity extends AppCompatActivity {
         }
     }
 
-    //TODO: if is files, after updating also add its.
+
+    private void cleanFolderUi( ) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                folders.removeAllViews();
+            }
+        });
+    }
+                    //TODO: if is files, after updating also add its.
     //TODO: Main folder without name.
     //TODO: Activity head not actual.
     private void updateFolderUi(final Map<Integer, FolderManager> tmpFoldersMap ) {
@@ -252,10 +284,6 @@ public class FolderActivity extends AppCompatActivity {
                           }
 
                           private void updateSubFolder(FolderManager folder) {
-//                              folder.folders.clear();
-//                              folder.files.clear();
-//                              folder.filesID.clear();
-
                               for( int a = 0; a < folder.subFoldersID.size(); a++ ) {
                                     Integer id = folder.subFoldersID.get(a);
                                   if(tmpFoldersMap.containsKey(id) ) {
