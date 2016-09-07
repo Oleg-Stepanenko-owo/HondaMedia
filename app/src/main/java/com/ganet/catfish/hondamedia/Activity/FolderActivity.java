@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.ganet.catfish.hondamedia.Java.FileManager;
 import com.ganet.catfish.hondamedia.Java.FolderManager;
+import com.ganet.catfish.hondamedia.Java.TrackTree;
 import com.ganet.catfish.hondamedia.R;
 
 import java.util.Map;
@@ -39,8 +40,10 @@ public class FolderActivity extends AppCompatActivity {
     boolean addedRoot;
     int currentDisk;
 
-    Map< Integer, FolderManager > foldersMap;
-    Map< Integer, FileManager > fileMap;
+    TrackTree tree;
+
+//    Map< Integer, FolderManager > foldersMap;
+//    Map< Integer, FileManager > fileMap;
     Vector<Integer> noFolderTrack;
 
     @Override
@@ -50,8 +53,10 @@ public class FolderActivity extends AppCompatActivity {
         addedRoot = false;
         currentDisk = 0;
 
-        foldersMap = new TreeMap<Integer, FolderManager>();
-        fileMap =  new TreeMap<Integer, FileManager>();
+        tree = new TrackTree(getLayoutInflater());
+
+//        foldersMap = new TreeMap<Integer, FolderManager>();
+//        fileMap =  new TreeMap<Integer, FileManager>();
         noFolderTrack = new Vector<Integer>();
 
         IntentFilter filter = new IntentFilter();
@@ -71,32 +76,19 @@ public class FolderActivity extends AppCompatActivity {
                             int folderId = intent.getIntExtra("FolderId", 0);
                             int parentId = intent.getIntExtra("FolderParentId", 0);
                             String name = intent.getStringExtra("FolderName");
-                            FolderManager mFolder;
 
-                            if( foldersMap.containsKey( new Integer(folderId) ) ){
-                                mFolder = foldersMap.get( new Integer(folderId) );
-                            } else {
-                                mFolder = new FolderManager(folderId, name);
-                                foldersMap.put(folderId, mFolder );
-                            }
-
-                            mFolder.setParentId( parentId );
-                            mFolder.setName( name );
+                            TrackTree.GaItem item = tree.updateFolder(folderId, parentId, name );
 
                             int subFCount = intent.getIntExtra("SubFCount", 0);
                             if( subFCount != 0 ) {
                                 for( int a = 0; a < subFCount; a++ ) {
                                     int sub = intent.getIntExtra("subID" + String.valueOf(a), 0);
-                                    if((sub != 0) && (!mFolder.subFoldersID.contains(sub)) )
-                                        mFolder.subFoldersID.add(sub);
+                                    if( sub != 0 )
+                                        tree.addSubFoldersID(item, sub);
                                 }
                             }
-                            {
-                                final Map< Integer, FolderManager > tmpFoldersMap = foldersMap;
-                                updateFolderUi(tmpFoldersMap);
-                                final Map< Integer, FileManager > tmpFileMap = fileMap;
-                                updateFileUi(tmpFileMap);
-                            }
+                            final TrackTree UI_Tree = tree;
+                            updateTreeUi(UI_Tree);
                         }
 
                         break;
@@ -106,26 +98,19 @@ public class FolderActivity extends AppCompatActivity {
                             for( int fCount = 0; fCount < intent.getIntExtra("folderCount", 0); fCount++ ) {
                                 int folderID = intent.getIntExtra("keyFolder_" + fCount, 0);
                                 String folderName = intent.getStringExtra("nameFolder_" + fCount );
-                                FolderManager mFolder;
-                                if( foldersMap.containsKey( new Integer(folderID) ) ){
-                                    mFolder = foldersMap.get( new Integer(folderID) );
-                                } else {
-                                    mFolder = new FolderManager(folderID, folderName);
-                                    foldersMap.put(folderID, mFolder );
-                                }
+                                int parentId = intent.getIntExtra("parentIDFolder_" + fCount, 0);
 
-                                mFolder.setParentId( intent.getIntExtra("parentIDFolder_" + fCount, 0) );
-                                mFolder.calcFrom = intent.getIntExtra("calcFromFolder_" + fCount, 0);
-                                mFolder.filesCount = intent.getIntExtra("trackCountFolder_" + fCount, 0);
+                                TrackTree.GaItem item = tree.updateFolder(folderID, parentId, folderName );
+                                tree.setItemCalcFrom( item, intent.getIntExtra("calcFromFolder_" + fCount, 0), TrackTree.E_ITEMTYPE.e_folder);
+                                tree.setFolderTrackCount(item, intent.getIntExtra("trackCountFolder_" + fCount, 0));
+
                                 for( int subF = 0; subF < intent.getIntExtra("subFolderCountFolder_" + fCount, 0); subF++ ) {
-                                    int subFolderID = intent.getIntExtra( "subFolderID" + subF + "CountFolder_" + fCount, 0);
-                                    if( !mFolder.subFoldersID.contains( subFolderID ) )
-                                        mFolder.subFoldersID.add( subFolderID );
+                                    tree.addSubFoldersID(item, intent.getIntExtra( "subFolderID" + subF + "CountFolder_" + fCount, 0) );
                                 }
                             }
                         }
-                        final Map< Integer, FolderManager > tmpFoldersMap  = foldersMap;
-                        updateFolderUi(tmpFoldersMap);
+                        final TrackTree UI_Tree = tree;
+                        updateTreeUi(UI_Tree);
                     }
                     break;
                     case FILESBYREQ:
@@ -137,20 +122,24 @@ public class FolderActivity extends AppCompatActivity {
                                 String trName = intent.getStringExtra("trackName_" + fCount);
                                 boolean rtIsSelect = intent.getBooleanExtra("trackSelect_" + fCount,false);
 
-                                FileManager mFileTr;
-                                if( fileMap.containsKey( new Integer(trID) ) ){
-                                    mFileTr = fileMap.get( new Integer(trID) );
-                                } else {
-                                    mFileTr = new FileManager(trID, trName);
-                                    fileMap.put(trID, mFileTr );
-                                }
-                                mFileTr.folderId = trFID;
-                                mFileTr.isSelect = rtIsSelect;
+                                TrackTree.GaItem item = tree.updateFile(trID, trFID, trName );
+                                tree.setItemIsSelected( item, rtIsSelect, TrackTree.E_ITEMTYPE.e_file );
+
+//                                FileManager mFileTr;
+//                                if( fileMap.containsKey( new Integer(trID) ) ){
+//                                    mFileTr = fileMap.get( new Integer(trID) );
+//                                } else {
+//                                    mFileTr = new FileManager(trID, trName);
+//                                    fileMap.put(trID, mFileTr );
+//                                }
+//                                mFileTr.folderId = trFID;
+//                                mFileTr.isSelect = rtIsSelect;
                             }
                         }
-
-                        final Map< Integer, FileManager > tmpFileMap = fileMap;
-                        updateFileUi(tmpFileMap);
+                        final TrackTree UI_Tree = tree;
+                        updateTreeUi(UI_Tree);
+//                        final Map< Integer, FileManager > tmpFileMap = fileMap;
+//                        updateFileUi(tmpFileMap);
                         break;
                     }
                     case TRACKINFO:
@@ -160,27 +149,31 @@ public class FolderActivity extends AppCompatActivity {
                             boolean isSelect = intent.getBooleanExtra("selected", false);
                             String name = intent.getStringExtra("TrackName");
 
-                            if( fileMap.containsKey(trackId) ) {
-                                final FileManager fm = fileMap.get(trackId);
-                                fileMap.remove(trackId);
-                                fm.isSelect = isSelect;
-                                fm.folderId = folderId;
-                                if( !fm.getName().isEmpty())
-                                    fm.setName(name);
-                                fileMap.put(trackId, fm);
-                            } else {
-                                FileManager fm = new FileManager(trackId, name);
-                                fm.isSelect = isSelect;
-                                fm.folderId = folderId;
-                                fileMap.put(trackId, fm);
-                            }
+                            TrackTree.GaItem item  = tree.updateFile( trackId, folderId, name );
+                            tree.setItemIsSelected(item, isSelect, TrackTree.E_ITEMTYPE.e_file);
+
+//                            if( fileMap.containsKey(trackId) ) {
+//                                final FileManager fm = fileMap.get(trackId);
+//                                fileMap.remove(trackId);
+//                                fm.isSelect = isSelect;
+//                                fm.folderId = folderId;
+//                                if( !fm.getName().isEmpty())
+//                                    fm.setName(name);
+//                                fileMap.put(trackId, fm);
+//                            } else {
+//                                FileManager fm = new FileManager(trackId, name);
+//                                fm.isSelect = isSelect;
+//                                fm.folderId = folderId;
+//                                fileMap.put(trackId, fm);
+//                            }
                         }
-                        final Map< Integer, FileManager > tmpFileMap = fileMap;
-                        updateFileUi(tmpFileMap);
+                        final TrackTree UI_Tree = tree;
+                        updateTreeUi(UI_Tree);
+//                        final Map< Integer, FileManager > tmpFileMap = fileMap;
+//                        updateFileUi(tmpFileMap);
                         break;
                     case DISKID:
-                        foldersMap.clear();
-                        fileMap.clear();
+                        tree.clear();
                         if( intent.hasExtra("diskID") ) {
                             currentDisk = intent.getIntExtra("diskID", 0);
                         }
@@ -225,13 +218,10 @@ public class FolderActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(foldersMap.size() == 0)
-        {
-            Intent in = new Intent(FOLDERINFO_REQ);
-            sendBroadcast(in);
-        }
-    }
+        Intent in = new Intent(FOLDERINFO_REQ);
+        sendBroadcast(in);
 
+    }
 
     private void cleanFolderUi( ) {
         runOnUiThread(new Runnable() {
@@ -244,38 +234,30 @@ public class FolderActivity extends AppCompatActivity {
 
     //TODO: Main folder without name.
     //TODO: Activity head not actual.
-    private void updateFolderUi(final Map<Integer, FolderManager> tmpFoldersMap ) {
+    private void updateTreeUi( final TrackTree treeUI ) {
         runOnUiThread(new Runnable() {
+            private int _attachment;
                           @Override
                           public void run() {
-                              if( tmpFoldersMap.containsKey(new Integer(0)) ) {
-                                  FolderManager root = tmpFoldersMap.get(new Integer(0));
-                                  updateSubFolder( root );
-
-                                  for( int a = 0; a < root.subFoldersID.size(); a++ ) {
-                                      if( rootFolder.findViewWithTag( ((FolderManager)foldersMap.get( root.subFoldersID.get(a))).getTag() ) == null ) {
-                                          rootFolder.addView( root.getView(getLayoutInflater(), 0) );
-                                      }
-                                  }
-                              }
+                              _attachment = 0;
+                              updateSubFolder( treeUI.getRoot(), _attachment );
                           }
 
-                          private void updateSubFolder(FolderManager folder) {
-                              for( int a = 0; a < folder.subFoldersID.size(); a++ ) {
-                                  Integer id = folder.subFoldersID.get(a);
-                                  if(tmpFoldersMap.containsKey(id) ) {
-                                      boolean isExistFolder = false;
-                                      for( int b = 0; b < folder.folders.size(); b++ )
-                                      {
-                                          if( ((FolderManager)folder.folders.get(b)).getId() == id ){
-                                              isExistFolder = true;
-                                              break;
-                                          }
+                          private void updateSubFolder( TrackTree.GaItem gaItem, int attachment ) {
+                              for( int a = 0; a < gaItem.subItemIds.size(); a++ ) {
+                                  TrackTree.GaItem subItem = gaItem.subItemIds.get(a);
+                                  if( rootFolder.findViewWithTag( subItem.getTag() ) != null ) {
+                                      LinearLayout view = (LinearLayout)rootFolder.findViewWithTag(subItem.getTag());
+                                      int rId = (subItem.getType() == TrackTree.E_ITEMTYPE.e_folder ? R.id.folder_name : R.id.file_name);
+                                      ((TextView) view.findViewById(rId)).setText(subItem.getName());
+                                  } else {
+                                      if( attachment == 0 ){
+                                          rootFolder.addView( subItem.getView(getLayoutInflater(), attachment) );
+                                      } else {
+                                          gaItem.addView(subItem, getLayoutInflater(), attachment);
                                       }
-                                      FolderManager nextFolder = tmpFoldersMap.get(id);
-                                      if( !isExistFolder ) folder.addFolder(nextFolder);
-                                      updateSubFolder(nextFolder);
                                   }
+                                  updateSubFolder(subItem, attachment+1);
                               }
                           }
                       }
@@ -283,64 +265,64 @@ public class FolderActivity extends AppCompatActivity {
     }
 
     //TODO: select currently active(play selected) track
-    private void updateFileUi( final Map<Integer, FileManager> tmpFileMap ) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                for( Map.Entry<Integer, FileManager> trEl : tmpFileMap.entrySet() ) {
-                    FileManager tmpFile = trEl.getValue();
-                    int folderID = tmpFile.folderId;
-
-                    if( !foldersMap.containsKey( 0 ) ) {
-                        FolderManager mFolder = new FolderManager(0, "");
-                        foldersMap.put(folderID, mFolder );
-                    }
-
-                    if( foldersMap.containsKey( folderID ) ) {
-                        int idx = noFolderTrack.indexOf( new Integer(tmpFile.id) );
-                        if( -1 != idx ) {
-                            foldersMap.get(0).filesID.remove( new Integer(tmpFile.id) );
-                            foldersMap.get(0).files.remove( tmpFile );
-                            noFolderTrack.remove(idx);
-                            rootFolder.removeView( rootFolder.findViewWithTag( tmpFile.getTag() ) );
-
-                            Log.d(TAG, "Remove unDefTrack ID " + tmpFile.id );
-                        }
-
-                        if( !foldersMap.get(folderID).filesID.contains( tmpFile.id ) )
-                            foldersMap.get(folderID).filesID.add( tmpFile.id );
-                        foldersMap.get(folderID).addFile( tmpFile );
-                    } else {
-                        noFolderTrack.add( tmpFile.id );
-                        Log.w( TAG, "Added unFolderTrack ID:" + tmpFile.id );
-                        // added in root
-                        foldersMap.get(0).filesID.add( tmpFile.id );
-                        foldersMap.get(0).addFile( tmpFile );
-                    }
-                }
-
-                if( foldersMap.containsKey(new Integer(0)) ) {
-                    rootFolder.removeAllViews();
-
-                    FolderManager root = foldersMap.get(new Integer(0));
-
-                    for( int a = 0; a < root.subFoldersID.size(); a++ ) {
-                        if( rootFolder.findViewWithTag( ((FolderManager)foldersMap.get( root.subFoldersID.get(a))).getTag() ) == null ) {
-                            rootFolder.addView( root.getView(getLayoutInflater(), 0) );
-                        }
-                        rootFolder.addView( (foldersMap.get(new Integer(0))).getView(getLayoutInflater(), 0));
-                    }
-
-                    for( int a = 0; a < root.files.size(); a++ ) {
-                        if( rootFolder.findViewWithTag( ((FileManager)root.files.get(a).getTag() )) == null ) {
-                            rootFolder.addView( root.files.get(a).getView(getLayoutInflater(), 0) );
-                        }
-                    }
-
-                }
-            }
-        });
-    }
+//    private void updateFileUi( final Map<Integer, FileManager> tmpFileMap ) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                for( Map.Entry<Integer, FileManager> trEl : tmpFileMap.entrySet() ) {
+//                    FileManager tmpFile = trEl.getValue();
+//                    int folderID = tmpFile.folderId;
+//
+//                    if( !foldersMap.containsKey( 0 ) ) {
+//                        FolderManager mFolder = new FolderManager(0, "");
+//                        foldersMap.put(folderID, mFolder );
+//                    }
+//
+//                    if( foldersMap.containsKey( folderID ) ) {
+//                        int idx = noFolderTrack.indexOf( new Integer(tmpFile.id) );
+//                        if( -1 != idx ) {
+//                            foldersMap.get(0).filesID.remove( new Integer(tmpFile.id) );
+//                            foldersMap.get(0).files.remove( tmpFile );
+//                            noFolderTrack.remove(idx);
+//                            rootFolder.removeView( rootFolder.findViewWithTag( tmpFile.getTag() ) );
+//
+//                            Log.d(TAG, "Remove unDefTrack ID " + tmpFile.id );
+//                        }
+//
+//                        if( !foldersMap.get(folderID).filesID.contains( tmpFile.id ) )
+//                            foldersMap.get(folderID).filesID.add( tmpFile.id );
+//                        foldersMap.get(folderID).addFile( tmpFile );
+//                    } else {
+//                        noFolderTrack.add( tmpFile.id );
+//                        Log.w( TAG, "Added unFolderTrack ID:" + tmpFile.id );
+//                        // added in root
+//                        foldersMap.get(0).filesID.add( tmpFile.id );
+//                        foldersMap.get(0).addFile( tmpFile );
+//                    }
+//                }
+//
+//                if( foldersMap.containsKey(new Integer(0)) ) {
+//                    rootFolder.removeAllViews();
+//
+//                    FolderManager root = foldersMap.get(new Integer(0));
+//
+//                    for( int a = 0; a < root.subFoldersID.size(); a++ ) {
+//                        if( rootFolder.findViewWithTag( ((FolderManager)foldersMap.get( root.subFoldersID.get(a))).getTag() ) == null ) {
+//                            rootFolder.addView( root.getView(getLayoutInflater(), 0) );
+//                        }
+//                        rootFolder.addView( (foldersMap.get(new Integer(0))).getView(getLayoutInflater(), 0));
+//                    }
+//
+//                    for( int a = 0; a < root.files.size(); a++ ) {
+//                        if( rootFolder.findViewWithTag( ((FileManager)root.files.get(a).getTag() )) == null ) {
+//                            rootFolder.addView( root.files.get(a).getView(getLayoutInflater(), 0) );
+//                        }
+//                    }
+//
+//                }
+//            }
+//        });
+//    }
 
     void File() {
 
