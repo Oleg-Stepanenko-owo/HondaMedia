@@ -72,7 +72,7 @@ public class FolderManager {
             v.setLayoutParams(layoutParams);
         }
 
-        LinearLayout children = (LinearLayout) v.findViewById(R.id.children);
+        LinearLayout children = (LinearLayout) v.findViewById(R.id.childFolder);
         for (FolderManager el : folders) {
             children.addView(el.getView(inflater, attachment + 1));
         }
@@ -89,7 +89,7 @@ public class FolderManager {
     public View.OnClickListener FolderOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            View view = v.findViewById(R.id.children);
+            View view = v.findViewById(R.id.childFolder);
             if (view.getVisibility() == View.VISIBLE) {
                 view.setVisibility(View.GONE);
             } else {

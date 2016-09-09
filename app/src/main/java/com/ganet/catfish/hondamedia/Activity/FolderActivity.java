@@ -13,13 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.ganet.catfish.hondamedia.Java.FileManager;
-import com.ganet.catfish.hondamedia.Java.FolderManager;
 import com.ganet.catfish.hondamedia.Java.TrackTree;
 import com.ganet.catfish.hondamedia.R;
 
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
 
 public class FolderActivity extends AppCompatActivity {
@@ -42,21 +38,18 @@ public class FolderActivity extends AppCompatActivity {
 
     TrackTree tree;
 
-//    Map< Integer, FolderManager > foldersMap;
-//    Map< Integer, FileManager > fileMap;
     Vector<Integer> noFolderTrack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
+//        rootFolder = (LinearLayout) getLayoutInflater().inflate(R.layout.inflate_folder, null);
+
         addedRoot = false;
         currentDisk = 0;
 
         tree = new TrackTree(getLayoutInflater());
-
-//        foldersMap = new TreeMap<Integer, FolderManager>();
-//        fileMap =  new TreeMap<Integer, FileManager>();
         noFolderTrack = new Vector<Integer>();
 
         IntentFilter filter = new IntentFilter();
@@ -70,12 +63,15 @@ public class FolderActivity extends AppCompatActivity {
         br = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "onReceive: " + intent.getAction() );
                 switch ( intent.getAction() ){
                     case FOLDERINFO:
                         if( intent.hasExtra("FolderId") ){
                             int folderId = intent.getIntExtra("FolderId", 0);
                             int parentId = intent.getIntExtra("FolderParentId", 0);
                             String name = intent.getStringExtra("FolderName");
+
+                            Log.d( TAG, "FolderId Id:" + folderId + "; ParentId:" + parentId + "; Name:" + name );
 
                             TrackTree.GaItem item = tree.updateFolder(folderId, parentId, name );
 
@@ -87,6 +83,7 @@ public class FolderActivity extends AppCompatActivity {
                                         tree.addSubFoldersID(item, sub);
                                 }
                             }
+                            tree.resolveTrack( rootFolder );
                             final TrackTree UI_Tree = tree;
                             updateTreeUi(UI_Tree);
                         }
@@ -124,22 +121,10 @@ public class FolderActivity extends AppCompatActivity {
 
                                 TrackTree.GaItem item = tree.updateFile(trID, trFID, trName );
                                 tree.setItemIsSelected( item, rtIsSelect, TrackTree.E_ITEMTYPE.e_file );
-
-//                                FileManager mFileTr;
-//                                if( fileMap.containsKey( new Integer(trID) ) ){
-//                                    mFileTr = fileMap.get( new Integer(trID) );
-//                                } else {
-//                                    mFileTr = new FileManager(trID, trName);
-//                                    fileMap.put(trID, mFileTr );
-//                                }
-//                                mFileTr.folderId = trFID;
-//                                mFileTr.isSelect = rtIsSelect;
                             }
                         }
                         final TrackTree UI_Tree = tree;
                         updateTreeUi(UI_Tree);
-//                        final Map< Integer, FileManager > tmpFileMap = fileMap;
-//                        updateFileUi(tmpFileMap);
                         break;
                     }
                     case TRACKINFO:
@@ -149,28 +134,12 @@ public class FolderActivity extends AppCompatActivity {
                             boolean isSelect = intent.getBooleanExtra("selected", false);
                             String name = intent.getStringExtra("TrackName");
 
+                            Log.d( TAG, "Track Id:" + trackId + "; FolderID:" + folderId + "; Name:" + name );
                             TrackTree.GaItem item  = tree.updateFile( trackId, folderId, name );
                             tree.setItemIsSelected(item, isSelect, TrackTree.E_ITEMTYPE.e_file);
-
-//                            if( fileMap.containsKey(trackId) ) {
-//                                final FileManager fm = fileMap.get(trackId);
-//                                fileMap.remove(trackId);
-//                                fm.isSelect = isSelect;
-//                                fm.folderId = folderId;
-//                                if( !fm.getName().isEmpty())
-//                                    fm.setName(name);
-//                                fileMap.put(trackId, fm);
-//                            } else {
-//                                FileManager fm = new FileManager(trackId, name);
-//                                fm.isSelect = isSelect;
-//                                fm.folderId = folderId;
-//                                fileMap.put(trackId, fm);
-//                            }
                         }
                         final TrackTree UI_Tree = tree;
                         updateTreeUi(UI_Tree);
-//                        final Map< Integer, FileManager > tmpFileMap = fileMap;
-//                        updateFileUi(tmpFileMap);
                         break;
                     case DISKID:
                         tree.clear();
@@ -232,32 +201,54 @@ public class FolderActivity extends AppCompatActivity {
         });
     }
 
-    //TODO: Main folder without name.
-    //TODO: Activity head not actual.
     private void updateTreeUi( final TrackTree treeUI ) {
         runOnUiThread(new Runnable() {
-            private int _attachment;
+                          private int _attachment;
+                            final private LinearLayout llRootFolder = rootFolder;
                           @Override
                           public void run() {
                               _attachment = 0;
                               updateSubFolder( treeUI.getRoot(), _attachment );
                           }
 
-                          private void updateSubFolder( TrackTree.GaItem gaItem, int attachment ) {
-                              for( int a = 0; a < gaItem.subItemIds.size(); a++ ) {
-                                  TrackTree.GaItem subItem = gaItem.subItemIds.get(a);
-                                  if( rootFolder.findViewWithTag( subItem.getTag() ) != null ) {
-                                      LinearLayout view = (LinearLayout)rootFolder.findViewWithTag(subItem.getTag());
-                                      int rId = (subItem.getType() == TrackTree.E_ITEMTYPE.e_folder ? R.id.folder_name : R.id.file_name);
-                                      ((TextView) view.findViewById(rId)).setText(subItem.getName());
-                                  } else {
-                                      if( attachment == 0 ){
-                                          rootFolder.addView( subItem.getView(getLayoutInflater(), attachment) );
+                          private void updateSubFolder( TrackTree.GaItem gaRootFolderItem, int attachment ) {
+                              for( int a = 0; a < gaRootFolderItem.subItemIds.size(); a++ ) {
+                                  TrackTree.GaItem subItem = gaRootFolderItem.subItemIds.get(a);
+
+                                  updateSubFolder(subItem, attachment+1);
+
+                                  LinearLayout view;
+
+                                  LinearLayout llItemChFolder = llRootFolder;
+                                  if(attachment != 0) llItemChFolder = (LinearLayout) gaRootFolderItem.getLLView().findViewById(R.id.childFolder);
+
+                                  subItem.updateAttacheLevel( attachment + 1 );
+
+                                  int rId = 0;
+                                  if( attachment == 0 || subItem.getType() == TrackTree.E_ITEMTYPE.e_folder ) {
+                                      rId  =  subItem.getType() == TrackTree.E_ITEMTYPE.e_folder ? R.id.folder_name : R.id.file_name;
+
+                                      if( llItemChFolder.findViewWithTag( subItem.getTag() ) != null ) { // update text
+                                          view = (LinearLayout) llItemChFolder.findViewWithTag(subItem.getTag());
+                                          ((TextView) view.findViewById(rId)).setText(subItem.getName());
                                       } else {
-                                          gaItem.addView(subItem, getLayoutInflater(), attachment);
+                                          view = subItem.getLLView();
+                                          ((TextView) view.findViewById(rId)).setText(subItem.getName());
+                                          Log.d(TAG, "updateSubFolder(" + attachment + ") ChildFolder add - " + subItem.getName());
+                                          llItemChFolder.addView( subItem.getLLView() );
+                                      }
+                                  } else {
+                                      rId = R.id.file_name;
+                                      if( gaRootFolderItem.getLLView().findViewWithTag( subItem.getTag() ) != null ) { // find in file block
+                                          view = (LinearLayout) gaRootFolderItem.getLLView().findViewWithTag(subItem.getTag());
+                                          ((TextView) view.findViewById(rId)).setText(subItem.getName());
+                                      } else {
+                                          view = subItem.getLLView();
+                                          ((TextView) view.findViewById(rId)).setText(subItem.getName());
+                                          Log.d(TAG, "updateSubFolder(" + attachment + ") ChildFile add - " + subItem.getName());
+                                          ((LinearLayout) gaRootFolderItem.getLLView().getChildAt(1)).addView( view );
                                       }
                                   }
-                                  updateSubFolder(subItem, attachment+1);
                               }
                           }
                       }
