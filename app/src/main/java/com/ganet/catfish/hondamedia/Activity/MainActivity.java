@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String FOLDERINFO = "com.ganet.catfish.ganet_service.folderinfo";
     public static final String STARTCDINFO_REQ = "com.ganet.catfish.ganet_service.startsdreq";
     public static final String STARTCDINFO_RES = "com.ganet.catfish.ganet_service.startsdres";
+    public static final String VOLUMEINFO = "com.ganet.catfish.ganet_service.volumeinfo";
 
     BroadcastReceiver br;
     TextView tvTime;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         filter.addAction(TIMEINFO);
         filter.addAction(ACTIVETR);
+        filter.addAction(VOLUMEINFO);
 
         br = new BroadcastReceiver() {
             @Override
@@ -40,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
                 switch ( intent.getAction() ){
                     case TIMEINFO:
                         updateTimeUi(intent.getStringExtra("Time"));
+                        break;
+                    case VOLUMEINFO:
+                        if( intent.hasExtra("VOL") )
+                        {
+                            CharSequence text = String.valueOf(intent.getIntExtra("VOL", 0));
+                            Toast.makeText( context, text, Toast.LENGTH_SHORT ).show();
+                        }
                         break;
                 }
             }
