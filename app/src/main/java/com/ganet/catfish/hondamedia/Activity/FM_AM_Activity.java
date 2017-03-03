@@ -106,6 +106,7 @@ public class FM_AM_Activity extends AppCompatActivity {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(RADIOINFO);
+        filter.addAction(MainActivity.PINGINFO);
 
         br = new BroadcastReceiver() {
             @Override
@@ -120,6 +121,10 @@ public class FM_AM_Activity extends AppCompatActivity {
                         final RADIOData sendData = rData;
                         updateRadioInfoUi(sendData);
                         break;
+                    case MainActivity.PINGINFO:
+                        if( intent.hasExtra("Ping" ) && intent.getIntExtra( "Ping", 0 ) == MainActivity.eDevPing.eCD.ordinal() )
+                            finishActiv(intent);
+                        break;
                 }
             }
         };
@@ -130,6 +135,10 @@ public class FM_AM_Activity extends AppCompatActivity {
     protected void onDestroy() {
         unregisterReceiver(br);
         super.onDestroy();
+    }
+    private void finishActiv( Intent intent ) {
+        setResult( RESULT_OK, intent );
+        finish();
     }
 
     private void updateRadioInfoUi(RADIOData sendData) {

@@ -43,6 +43,7 @@ public class CD_DVD_Activity extends AppCompatActivity {
 
         filter.addAction(MainActivity.ACTIVETR);
         filter.addAction(MainActivity.STARTCDINFO_RES);
+        filter.addAction(MainActivity.PINGINFO);
 
         br = new BroadcastReceiver() {
             @Override
@@ -78,6 +79,11 @@ public class CD_DVD_Activity extends AppCompatActivity {
                         atInfo.trackId = intent.getIntExtra("trackId", 0 );
                         atInfo.playTime = intent.getStringExtra("playTrackTime");
                         atInfo.playTrackName = intent.getStringExtra("playTrackName");
+                        break;
+
+                    case MainActivity.PINGINFO:
+                        if( intent.hasExtra("Ping" ) && intent.getIntExtra( "Ping", 0 ) > MainActivity.eDevPing.eCD.ordinal() )
+                            finishActiv(intent);
                         break;
                 }
             }
@@ -129,7 +135,7 @@ public class CD_DVD_Activity extends AppCompatActivity {
             }
             case R.id.play_list: {
                 Intent intent = new Intent(this, FolderActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 2);
                 break;
             }
             case R.id.back: {
@@ -137,6 +143,19 @@ public class CD_DVD_Activity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    private void finishActiv( Intent intent ) {
+        setResult( RESULT_OK, intent );
+        finish();
+    }
+
+    @Override
+    protected void onActivityResult( int requestCode, int resultCode, Intent data ) {
+        if ( data == null || RESULT_OK != resultCode ) { return; }
+        int finWithResult = data.getIntExtra( "Ping", MainActivity.eDevPing.eNone.ordinal() );
+
+        if ( finWithResult > MainActivity.eDevPing.eCD.ordinal() ) finishActiv(data);
     }
 
     void Prev() {

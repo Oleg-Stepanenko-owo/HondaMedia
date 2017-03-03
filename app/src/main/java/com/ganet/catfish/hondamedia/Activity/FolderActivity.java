@@ -59,6 +59,7 @@ public class FolderActivity extends AppCompatActivity {
         filter.addAction(TRACKINFO);
         filter.addAction(DISKID);
         filter.addAction(ACTIVETR);
+        filter.addAction(MainActivity.PINGINFO);
 
         br = new BroadcastReceiver() {
             @Override
@@ -157,6 +158,10 @@ public class FolderActivity extends AppCompatActivity {
                             }
                         }
                         break;
+                    case MainActivity.PINGINFO:
+                        if( intent.hasExtra("Ping" ) && intent.getIntExtra( "Ping", 0 ) > MainActivity.eDevPing.eCD.ordinal() )
+                            finishActiv(intent);
+                        break;
                 }
             }
         };
@@ -176,6 +181,11 @@ public class FolderActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void finishActiv( Intent intent ) {
+        setResult( RESULT_OK, intent );
+        finish();
     }
 
     @Override
